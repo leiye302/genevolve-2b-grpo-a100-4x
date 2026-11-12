@@ -3,7 +3,8 @@ import os
 
 from .common import ROOT, load_script, read_json, required_env, write_json
 from .data import Example
-from .feedback import make_renderer, render_program
+from .evaluation_render import render_for_evaluation
+from .feedback import make_renderer
 from .policy import valid_program
 
 
@@ -45,10 +46,11 @@ class WiseFeedback:
     def evaluate(self, agent, example, metadata, image_path):
         result = agent.collect(example.prompt).result
         row = {"prompt_id": int(example.id), "prompt": example.prompt, "success": False,
-               "result": result.to_dict(), "scores": dict.fromkeys(FIELDS, 0)}
-        if not valid_program(result):
+               "result": result.to_dict(), "program_valid": valid_program(result),
+               "scores": dict.fromkeys(FIELDS, 0)}
+        row.update(render_for_evaluation(self.renderer, result, example.prompt, image_path))
+        if not row["success"]:
             return row
-        render_program(self.renderer, result, image_path)
         judge = wise_judge()
         messages = judge.build_evaluation_messages(metadata, judge.encode_image(str(image_path)))
         for _ in range(3):

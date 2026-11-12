@@ -82,6 +82,10 @@ python run.py --work "$WORK" eval --split bench --policy "$SFT_CHECKPOINT"
 
 保留对照仓库的独立 WISE legacy 评测（1,000 题）；仅需要它时运行 `bash scripts/setup.sh --wise-sources`，并配置提供 `gpt-4o-2024-05-13` 的 `WISE_API_KEY`（兼容端点可另设 `WISE_BASE_URL`），再执行 `python run.py --work "$WORK" eval --split wise`。
 
+评测渲染直接调用固定版本的官方 `scripts/generate_images.py`：存在生成指令和至少一条实际存在的参考图路径时，使用 Actor 的方案；否则尝试以原始用户请求、无参考图生成，再按相同评分器评分。绘图后端若不支持无参考图，或生成仍失败，该题仍计零，不重试为另一个方案。逐题结果中的 `program_valid` 单独记录 Actor 原方案的有效性，`render_fallback`／`render_source` 标明是否使用回退，不能把回退生成成功算成 Actor 原方案有效。GenEvolve-Bench、`rl-val` 和 WISE 共用此规则；RL 训练中的无效程序零奖励不变。
+
+评测配置保存渲染协议版本，旧版“无效程序直接计零”的缓存不能与新版混用；请先归档旧评测目录，再重新评测。此修复与[配对方法仓库的评测修复](https://github.com/leiye302/GenEvolve-2B-Reproduction/commit/0c35d1a8cce551887b9afb608afa35ca755e7104)一致；`sources.json` 仍保留原训练配方的对照版本。模型、提示词、采样参数、评审模型、训练数据及 loss 均未因此改变。
+
 ## 离线验收
 
 ```bash

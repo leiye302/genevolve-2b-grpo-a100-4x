@@ -6,6 +6,7 @@ import torch.distributed as dist
 from .common import BENCH, RL, ROOT, jsonl, load_upstream, model_ready, read_json, required_env, write_json
 from .data import examples
 from .distributed import barrier, initialize, load_model
+from .evaluation_render import EVALUATION_RENDER_POLICY, render_for_evaluation
 from .feedback import LiveFeedback, image_scorer, judge_settings
 from .policy import make_agent, valid_program
 
@@ -17,11 +18,12 @@ def evaluate_case(agent, feedback, example, metadata, image_path):
         **{key: metadata.get(key) or "unknown" for key in ("eval_type", "category", "difficulty")},
         "id": example.id, "prompt": example.prompt, "gt_image": str(example.gt),
         "result": result.to_dict(), "success": False, "eval_success": False,
+        "program_valid": valid_program(result),
     }
-    if valid_program(result):
-        feedback.render(result, image_path)
+    row.update(render_for_evaluation(feedback.renderer, result, example.prompt, image_path))
+    if row["success"]:
         row.update(
-            success=True, eval_success=True, image_path=str(image_path),
+            eval_success=True,
             scores=feedback.score_image(example, image_path),
         )
     return row
@@ -68,12 +70,16 @@ def _evaluate(work, policy, split, max_cases, rank, size, device):
     contract = {
         "policy": str(policy), "split": split, "count": count,
         "checkpoint": read_json(marker) if marker.is_file() else None,
+        "render_policy": EVALUATION_RENDER_POLICY,
     }
     if split != "wise":
         contract["judge"] = judge_settings(cfg)
     lock = folder / "config.json"
     if lock.is_file() and read_json(lock) != contract:
-        raise RuntimeError(f"Evaluation in {folder} uses a different policy or judge. Archive it before rerunning.")
+        raise RuntimeError(
+            f"Evaluation in {folder} uses a different policy, judge, or rendering protocol. "
+            "Archive it before rerunning."
+        )
     if rank == 0:
         write_json(lock, contract)
     barrier()
