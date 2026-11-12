@@ -9,6 +9,8 @@ from statistics import fmean
 import torch
 import torch.distributed as dist
 
+from .actor_text import ACTOR_TEXT_PROTOCOL
+
 from .common import RL, ROOT, load_upstream, model_ready, read_json, required_env, source_lock, write_json
 from .data import examples
 from .distributed import (
@@ -95,6 +97,7 @@ def update_actor(actor, optimizer, groups, cfg, device, dummy_id):
 
 def write_rollouts(folder, group):
     write_json(folder / "rollouts.json", {
+        "actor_text_protocol": ACTOR_TEXT_PROTOCOL,
         "id": group.example.id,
         "prompt": group.example.prompt,
         "trajectories": [

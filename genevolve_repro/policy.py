@@ -6,6 +6,8 @@ from torch import nn
 from torch.nn import functional as F
 from torch.utils.checkpoint import checkpoint
 
+from .actor_text import decode_actor_response
+
 
 RAW_REFERENCE = re.compile(r"https?://|IMG_\d+", re.IGNORECASE)
 
@@ -152,7 +154,7 @@ def make_agent(model, tokenizer, device, config, **tools):
                     raise RuntimeError("The actor returned zero tokens.")
                 self.turns.append(Turn(prefix, tokens))
                 self.generated += len(tokens)
-                return tokenizer.decode(tokens, skip_special_tokens=True).strip()
+                return decode_actor_response(tokenizer, tokens)
             except Exception as error:
                 self.failure = error
                 raise

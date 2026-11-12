@@ -3,6 +3,8 @@ import os
 import torch
 import torch.distributed as dist
 
+from .actor_text import ACTOR_TEXT_PROTOCOL
+
 from .common import BENCH, RL, ROOT, jsonl, load_upstream, model_ready, read_json, required_env, write_json
 from .data import examples
 from .distributed import barrier, initialize, load_model
@@ -71,13 +73,14 @@ def _evaluate(work, policy, split, max_cases, rank, size, device):
         "policy": str(policy), "split": split, "count": count,
         "checkpoint": read_json(marker) if marker.is_file() else None,
         "render_policy": EVALUATION_RENDER_POLICY,
+        "actor_text_protocol": ACTOR_TEXT_PROTOCOL,
     }
     if split != "wise":
         contract["judge"] = judge_settings(cfg)
     lock = folder / "config.json"
     if lock.is_file() and read_json(lock) != contract:
         raise RuntimeError(
-            f"Evaluation in {folder} uses a different policy, judge, or rendering protocol. "
+            f"Evaluation in {folder} uses a different policy, judge, rendering protocol, or Actor text protocol. "
             "Archive it before rerunning."
         )
     if rank == 0:

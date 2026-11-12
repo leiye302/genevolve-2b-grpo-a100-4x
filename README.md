@@ -88,6 +88,8 @@ python run.py --work "$WORK" eval --split bench --policy "$SFT_CHECKPOINT"
 
 ## 离线验收
 
+Actor 解码统一由 `genevolve_repro.actor_text.decode_actor_response` 执行，与配对方法仓库采用相同实现：保留已注册的特殊 `<RETHINK>`，其余特殊控制 token 仍按原规则清理。训练 rollout、GenEvolve-Bench、`rl-val` 和 WISE 共用此路径；历史和逐题结果不会再丢掉已经生成的 marker。原始生成 token ID、GRPO loss 和采样配置不变，不新增词表、提示词、Teacher 或 RETHINK 路由算法。普通无 marker 模型的解码保持原样。新 rollout 记录解码版本，旧评测缓存不能与新版混用；请先归档旧评测目录。已有训练进程不会被这个代码更新热切换或重启。
+
 ```bash
 GENEVOLVE_PYTHON=python3.11 bash scripts/setup.sh --sources-only
 python3.11 -m venv .venv-smoke
