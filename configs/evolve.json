@@ -1,0 +1,22 @@
+{
+  "seed": 42,
+  "prompt_batch": 8,
+  "rollouts_per_prompt": 6,
+  "temperature": 0.7,
+  "top_p": 0.95,
+  "max_rounds": 11,
+  "max_initial_tokens": 6144,
+  "max_response_tokens": 30000,
+  "max_turn_tokens": 4096,
+  "context_tokens": 65536,
+  "learning_rate": 0.000001,
+  "clip_low": 0.20,
+  "clip_high": 0.28,
+  "kl_coef": 0.001,
+  "text_reward_coef": 0.5,
+  "save_every": 10,
+  "keep_checkpoints": 2,
+  "judge_model": "qwen3.7-flash-2026-07-15",
+  "judge_base_url": "https://dashscope.aliyuncs.com/compatible-mode/v1",
+  "judge_enable_thinking": false
+}

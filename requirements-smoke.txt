@@ -1,0 +1,10 @@
+transformers==4.57.1
+tokenizers==0.22.1
+huggingface-hub==0.36.0
+filelock==3.20.0
+safetensors==0.6.2
+openai==1.109.1
+fastapi==0.121.1
+httpx==0.28.1
+Pillow==11.3.0
+requests==2.32.3

@@ -1,0 +1,26 @@
+{
+  "agent": {
+    "repo": "https://github.com/MeiGen-AI/GenEvolve.git",
+    "revision": "23c847c559ccc0f95bbf4b3d8925898463822f4c"
+  },
+  "comparison": {
+    "repo": "https://github.com/leiye302/GenEvolve-2B-Reproduction.git",
+    "revision": "67f58aaa6c4324739a5da6cd78b8a33021cb41aa"
+  },
+  "base": {
+    "repo": "Qwen/Qwen3-VL-2B-Instruct",
+    "revision": "89644892e4d85e24eaac8bacfd4f463576704203"
+  },
+  "data": {
+    "repo": "MeiGen-AI/GenEvolve-Data-Bench",
+    "revision": "9f291879d5dfe1195f47883e23069d3f6e829afe"
+  },
+  "renderer": {
+    "repo": "Qwen/Qwen-Image-Edit-2511",
+    "revision": "6f3ccc0b56e431dc6a0c2b2039706d7d26f22cb9"
+  },
+  "wise": {
+    "repo": "https://github.com/PKU-YuanGroup/WISE.git",
+    "revision": "d884ff1bcf4daa01f3a7913a1caea97a5aa393ae"
+  }
+}
