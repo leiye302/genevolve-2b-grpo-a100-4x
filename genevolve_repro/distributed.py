@@ -69,7 +69,11 @@ def copy_actor(sharded, target, rank0_only=False):
     if not isinstance(sharded, FSDP):
         target.load_state_dict(sharded.model.state_dict())
         return
-    with FSDP.summon_full_params(sharded, writeback=False, offload_to_cpu=True, rank0_only=rank0_only):
+    # For CPU/Gloo smoke tests, the gathered parameters are already on CPU.
+    # Torch 2.8's CPU offload context assumes a device-to-host copy.
+    with FSDP.summon_full_params(
+        sharded, writeback=False, offload_to_cpu=sharded.compute_device.type != "cpu", rank0_only=rank0_only,
+    ):
         if not rank0_only or dist.get_rank() == 0:
             source = {
                 name.replace("._fsdp_wrapped_module.", "."): parameter
@@ -103,11 +107,12 @@ def barrier():
 def full_state(actor):
     if not isinstance(actor, FSDP):
         return nullcontext()
+    offload = actor.compute_device.type != "cpu"
     return FSDP.state_dict_type(
         actor,
         StateDictType.FULL_STATE_DICT,
-        FullStateDictConfig(offload_to_cpu=True, rank0_only=True),
-        FullOptimStateDictConfig(offload_to_cpu=True, rank0_only=True),
+        FullStateDictConfig(offload_to_cpu=offload, rank0_only=True),
+        FullOptimStateDictConfig(offload_to_cpu=offload, rank0_only=True),
     )
 
 

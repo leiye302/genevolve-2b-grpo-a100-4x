@@ -93,4 +93,4 @@ python -m pip install -r requirements-smoke.txt
 python -m unittest discover -s tests -v
 ```
 
-CPU 检查用小模型和模拟服务执行真实 rollout token 评分、奖励、反向传播、断点恢复、导出与评测汇总。Linux CI 另覆盖四 rank FSDP/Gloo。它们不代表目标机上的四卡 CUDA、对方实际 SFT 文件或真实外部服务已经验证。
+CPU 检查用小模型和模拟服务执行真实 rollout token 评分、奖励、反向传播、断点恢复、导出与评测汇总。Linux CI 另覆盖四 rank FSDP/Gloo；仅在纯 CPU 测试中跳过设备到 CPU 的 offload，CUDA 仍用对照仓库的配置。它们不代表目标机上的四卡 CUDA、对方实际 SFT 文件或真实外部服务已经验证。
